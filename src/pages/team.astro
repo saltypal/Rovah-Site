@@ -2,6 +2,14 @@
 import Layout from '~/layouts/PageLayout.astro';
 import teamData from '~/data/teams';
 
+const subdivisionColors = {
+  'CS & AI': 'Blue',
+  'Mechanical': 'Red',
+  'Science': 'Green',
+  'EC & EE': 'Pink',
+  'Media': 'Pink'
+};
+
 const metadata = {
   title: 'Our Team',
   description: 'Meet the members of Rovah – the official rover team at Amrita Bengaluru Campus.',
@@ -44,17 +52,33 @@ const allLeads = await Promise.all(allLeadsRaw.map(async (l) => ({
   photoResolved: await resolvePhoto(l.photo)
 })));
 
+const allPMsRaw = (teamData['Project Manager'] as Member[]) ?? [];
+const allPMs = await Promise.all(allPMsRaw.map(async (p) => ({
+  ...p,
+  photoResolved: await resolvePhoto(p.photo)
+})));
+
 const adminLead = allLeads.find(l => l.role === 'Administrative Lead');
 const techLead  = allLeads.find(l => l.role === 'Technical Lead');
 const teamLeads = allLeads.filter(l => l.role === 'Team Lead');
 
+const colorHexMap = {
+  Red: '#ef4444',
+  Blue: '#3b82f6',
+  Green: '#22c55e',
+  Pink: '#ec4899'
+};
+
 const subdivisionMap = [
-  { key: 'CS and AI',  label: 'CS & AI',    color: '#4f46e5', teamLeadName: 'Chaturya' },
-  { key: 'Science',    label: 'Science',     color: '#16a34a', teamLeadName: 'Lohitashwa Talamanchi' },
-  { key: 'Electrical', label: 'EC & EE',     color: '#9333ea', teamLeadName: 'Prakhar' },
-  { key: 'Mechanical', label: 'Mechanical',  color: '#ea580c', teamLeadName: 'M Nikhil' },
-  { key: 'Media',      label: 'Media',       color: '#e11d48', teamLeadName: 'Pragathi L' },
-];
+  { key: 'CS and AI',  label: 'CS & AI',    teamLeadName: 'Chaturya' },
+  { key: 'Science',    label: 'Science',     teamLeadName: 'Lohitashwa Talamanchi' },
+  { key: 'Electrical', label: 'EC & EE',     teamLeadName: 'Prakhar' },
+  { key: 'Mechanical', label: 'Mechanical',  teamLeadName: 'M Nikhil' },
+  { key: 'Media',      label: 'Media',       teamLeadName: 'Pragathi L' },
+].map(sub => ({
+  ...sub,
+  color: colorHexMap[subdivisionColors[sub.label as keyof typeof subdivisionColors]] || '#64748b'
+}));
 
 // Pre-resolve all subdivision members
 const resolvedSubdivisions = {} as Record<string, Member[]>;
@@ -134,36 +158,36 @@ function initials(name: string) {
           <div class="org-root-row">
             {techLead && (
               <div class="root-node-container">
-                <div 
-                  class="pcard root-card interactive-card" 
-                  style="--accent: #0ea5e9"
-                  data-name={techLead.name}
-                  data-role={techLead.role}
-                  data-speciality={techLead.speciality || ""}
-                  data-about={techLead.about || ""}
-                  data-photo={techLead.photoResolved || ""}
-                  data-github={techLead.socials.github}
-                  data-linkedin={techLead.socials.linkedin}
-                  data-email={techLead.socials.email}
-                  data-subdivision=""
-                  data-avatar-gradient="linear-gradient(135deg, #38bdf8, #0284c7)"
-                >
-                  <div class="pcard-info">
-                    <span class="pcard-name">{techLead.name}</span>
-                    <span class="pcard-role">{techLead.role}</span>
+                  <div 
+                    class="pcard root-card interactive-card leadership-card" 
+                    style="--accent: #eab308"
+                    data-name={techLead.name}
+                    data-role={techLead.role}
+                    data-speciality={techLead.speciality || ""}
+                    data-about={techLead.about || ""}
+                    data-photo={techLead.photoResolved || ""}
+                    data-github={techLead.socials.github}
+                    data-linkedin={techLead.socials.linkedin}
+                    data-email={techLead.socials.email}
+                    data-subdivision=""
+                    data-avatar-gradient="linear-gradient(135deg, #fcd34d, #f59e0b)"
+                  >
+                    <div class="pcard-info">
+                      <span class="pcard-name">{techLead.name}</span>
+                      <span class="pcard-role">{techLead.role}</span>
+                    </div>
+                    <div class="pcard-avatar" style={techLead.photoResolved ? `background: url(${techLead.photoResolved}) center/cover no-repeat` : `background: linear-gradient(135deg, #fcd34d, #f59e0b)`}>
+                      {!techLead.photoResolved && initials(techLead.name)}
+                    </div>
                   </div>
-                  <div class="pcard-avatar" style={techLead.photoResolved ? `background: url(${techLead.photoResolved}) center/cover no-repeat` : `background: linear-gradient(135deg, #38bdf8, #0284c7)`}>
-                    {!techLead.photoResolved && initials(techLead.name)}
-                  </div>
-                </div>
 
                 <!-- Administrative Lead connected as staff/assistant node (Karen Schuler style) -->
                 {adminLead && (
                   <div class="staff-node">
                     <div class="staff-connector-h"></div>
                     <div 
-                      class="pcard staff-card interactive-card" 
-                      style="--accent: #64748b"
+                      class="pcard staff-card interactive-card leadership-card" 
+                      style="--accent: #eab308"
                       data-name={adminLead.name}
                       data-role={adminLead.role}
                       data-speciality={adminLead.speciality || ""}
@@ -173,13 +197,13 @@ function initials(name: string) {
                       data-linkedin={adminLead.socials.linkedin}
                       data-email={adminLead.socials.email}
                       data-subdivision=""
-                      data-avatar-gradient="linear-gradient(135deg, #94a3b8, #475569)"
+                      data-avatar-gradient="linear-gradient(135deg, #fcd34d, #f59e0b)"
                     >
                       <div class="pcard-info">
                         <span class="pcard-name">{adminLead.name}</span>
                         <span class="pcard-role">{adminLead.role}</span>
                       </div>
-                      <div class="pcard-avatar" style={adminLead.photoResolved ? `background: url(${adminLead.photoResolved}) center/cover no-repeat` : `background: linear-gradient(135deg, #94a3b8, #475569)`}>
+                      <div class="pcard-avatar" style={adminLead.photoResolved ? `background: url(${adminLead.photoResolved}) center/cover no-repeat` : `background: linear-gradient(135deg, #fcd34d, #f59e0b)`}>
                         {!adminLead.photoResolved && initials(adminLead.name)}
                       </div>
                     </div>
@@ -198,7 +222,7 @@ function initials(name: string) {
               const tl = teamLeads.find(t => t.name === sub.teamLeadName);
               if (!tl) return null;
               const members = resolvedSubdivisions[sub.key] ?? [];
-              const pms     = members.filter(m => m.role === 'Project Manager');
+              const pms     = allPMs.filter(m => m.subdivision === sub.label);
               const mems    = members.filter(m => m.role === 'Member');
 
               return (
@@ -239,7 +263,7 @@ function initials(name: string) {
                       {pms.map(pm => (
                         <div class="subordinate-item">
                           <div 
-                            class="pcard pm-card interactive-card" 
+                            class="pcard pm-card interactive-card pm-highlight" 
                             style={`--accent: ${sub.color}`}
                             data-name={pm.name}
                             data-role="Project Manager"
@@ -337,8 +361,10 @@ function initials(name: string) {
       </section>
 
       {subdivisionMap.map(sub => {
+        const pms = allPMs.filter(m => m.subdivision === sub.label);
         const members = resolvedSubdivisions[sub.key] ?? [];
-        if (!members.length) return null;
+        const allSubMembers = [...pms, ...members];
+        if (!allSubMembers.length) return null;
         return (
           <section class="grid-section">
             <h2 class="section-title" style={`border-bottom-color:${sub.color}33`}>
@@ -346,7 +372,7 @@ function initials(name: string) {
               {sub.label}
             </h2>
             <div class="member-grid">
-              {members.map(m => (
+              {allSubMembers.map(m => (
                 <div 
                   class="pcard grid-pcard interactive-card" 
                   style={`--accent:${sub.color}`}
@@ -656,10 +682,10 @@ function initials(name: string) {
   align-items: center;
   justify-content: space-between;
   gap: 0.4rem;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: color-mix(in srgb, var(--accent, #4f46e5) 8%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--accent, #4f46e5) 30%, #e2e8f0);
   border-left: 3.5px solid var(--accent, #4f46e5);
-  border-radius: 0.35rem;
+  border-radius: 0.4rem;
   padding: 0.4rem 0.6rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: all 0.15s ease-in-out;
@@ -671,18 +697,40 @@ function initials(name: string) {
   cursor: pointer;
 }
 .pcard:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
-  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px color-mix(in srgb, var(--accent, #4f46e5) 15%, rgba(0, 0, 0, 0.08));
+  border-color: color-mix(in srgb, var(--accent, #4f46e5) 50%, #cbd5e1);
 }
 :global(.dark) .pcard {
-  background: #0f172a;
-  border-color: #1e293b;
+  background: color-mix(in srgb, var(--accent, #4f46e5) 15%, #0f172a);
+  border-color: color-mix(in srgb, var(--accent, #4f46e5) 30%, #1e293b);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 :global(.dark) .pcard:hover {
-  border-color: #334155;
-  background: #1e293b;
+  border-color: color-mix(in srgb, var(--accent, #4f46e5) 60%, #334155);
+  background: color-mix(in srgb, var(--accent, #4f46e5) 25%, #1e293b);
+  box-shadow: 0 6px 12px color-mix(in srgb, var(--accent, #4f46e5) 20%, rgba(0, 0, 0, 0.4));
+}
+
+.pm-highlight {
+  box-shadow: inset 0 0 0 2px var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+:global(.dark) .pm-highlight {
+  box-shadow: inset 0 0 0 2px var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+.leadership-card {
+  border-width: 3px !important;
+  border-color: #eab308 !important;
+  background: #fffbeb !important;
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.15) !important;
+}
+:global(.dark) .leadership-card {
+  background: #422006 !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2) !important;
 }
 
 .pcard-avatar {
@@ -818,17 +866,17 @@ function initials(name: string) {
 .staff-connector-h {
   width: 20px;
   height: 2px;
-  background: #cbd5e1;
+  background: #94a3b8;
 }
-:global(.dark) .staff-connector-h { background: #334155; }
+:global(.dark) .staff-connector-h { background: #475569; }
 
 /* Main trunk line straight down from root to bridge line */
 .main-trunk-line {
   width: 2px;
   height: 30px;
-  background: #cbd5e1;
+  background: #94a3b8;
 }
-:global(.dark) .main-trunk-line { background: #334155; }
+:global(.dark) .main-trunk-line { background: #475569; }
 
 /* ─── Branches row ──────────────────────────────────────────────────────── */
 .org-branches-row {
@@ -856,17 +904,17 @@ function initials(name: string) {
   position: absolute;
   top: 0;
   height: 2px;
-  background: #cbd5e1;
-  width: 50%;
+  background: #94a3b8;
+  width: calc(50% + 0.625rem); /* Span across the 1.25rem gap */
 }
 :global(.dark) .org-branch-col::before,
-:global(.dark) .org-branch-col::after { background: #334155; }
+:global(.dark) .org-branch-col::after { background: #475569; }
 
 .org-branch-col::before {
-  left: 0;
+  left: -0.625rem;
 }
 .org-branch-col::after {
-  right: 0;
+  right: -0.625rem;
 }
 
 /* Hide first col's left connector, and last col's right connector */
@@ -880,35 +928,23 @@ function initials(name: string) {
 /* Vertical stub connecting each column to the bridge line above */
 .branch-connector-v {
   width: 2px;
-  height: 18px;
-  background: #cbd5e1;
+  height: 24px;
+  background: #94a3b8;
   margin-bottom: 0px;
 }
-:global(.dark) .branch-connector-v { background: #334155; }
+:global(.dark) .branch-connector-v { background: #475569; }
 
 /* ─── Subordinates stacked vertically (Microsoft Teams style) ────────────── */
 .subordinates-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-left: 24px;
+  gap: 12px;
+  padding-left: 28px;
   position: relative;
-  margin-top: 18px;
+  margin-top: 24px;
   width: 100%;
   align-items: flex-start;
 }
-
-/* Vertical line down the left side of subordinates */
-.subordinates-list::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 26px; /* stops at connection to last item */
-  left: 8px;
-  width: 2px;
-  background: #cbd5e1;
-}
-:global(.dark) .subordinates-list::before { background: #334155; }
 
 .subordinate-item {
   position: relative;
@@ -917,18 +953,51 @@ function initials(name: string) {
   justify-content: flex-start;
 }
 
-/* Horizontal branch line connecting card to vertical tree line */
+/* Vertical spine for subordinates */
+.subordinates-list::before {
+  content: '';
+  position: absolute;
+  top: -24px; /* Reach up to the Team Lead card */
+  bottom: 26px; /* Stop exactly at the middle of the last card (52px / 2 = 26px) */
+  left: 8px; /* 28px padding - 20px offset = 8px */
+  width: 2px;
+  background: #94a3b8;
+  z-index: 0;
+}
+:global(.dark) .subordinates-list::before { background: #475569; }
+
+.subordinate-item {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  z-index: 1;
+}
+
+/* Horizontal connectors for all items */
 .subordinate-item::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: -16px;
-  width: 16px;
+  left: -20px;
+  width: 20px;
   height: 2px;
-  background: #cbd5e1;
+  background: #94a3b8;
   transform: translateY(-50%);
 }
-:global(.dark) .subordinate-item::before { background: #334155; }
+:global(.dark) .subordinate-item::before { background: #475569; }
+
+/* The very last item gets a rounded corner to cap the vertical spine cleanly */
+.subordinate-item:last-child::before {
+  top: 0;
+  height: 50%;
+  background: transparent;
+  transform: none;
+  border-left: 2px solid #94a3b8;
+  border-bottom: 2px solid #94a3b8;
+  border-bottom-left-radius: 6px;
+}
+:global(.dark) .subordinate-item:last-child::before { border-color: #475569; }
 
 /* Custom sizes for card widths inside levels */
 .root-card { width: 195px; }
